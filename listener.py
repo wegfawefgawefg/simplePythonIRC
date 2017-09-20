@@ -10,7 +10,6 @@ def checkForNewMessageFromServer( socketToServer ):
     try:
         bytesFromServer = socketToServer.recv( 1024 )
         while bytesFromServer:
-            messageFromServer = bytesFromServer.decode()
             stdout.buffer.write( bytesFromServer )
             stdout.flush()
             bytesFromServer = socketToServer.recv( 1024 )
