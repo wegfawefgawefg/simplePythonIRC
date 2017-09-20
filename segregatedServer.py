@@ -7,7 +7,7 @@ def sendMessageToAllListeners( message, listeners ):
     #print( "the listeners listen..." )
     for listener in listeners:
         try:
-            listener.send( message.encode() )
+            listener.send( message )
         except socket.timeout:
             pass
         except socket.error:
@@ -20,10 +20,10 @@ def checkForNewMessages( speakers, listeners ):
         bytesFromSpeaker = None
         try:
             bytesFromSpeaker = speaker.recv( 1024 )
-            if bytesFromSpeaker is not None:
-                print( "A traveler speaks..." )
-                messageFromSpeaker = bytesFromSpeaker.decode()
-                sendMessageToAllListeners( messageFromSpeaker, listeners )
+            while bytesFromSpeaker:
+                #print( "A traveler speaks..." )
+                sendMessageToAllListeners( bytesFromSpeaker, listeners )
+                bytesFromSpeaker = speaker.recv( 1024 )
         except socket.timeout:
             pass
         except socket.error:
