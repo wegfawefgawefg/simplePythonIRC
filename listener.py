@@ -1,22 +1,19 @@
 import socket
 import collections
 import os
-from sys import stdin
+from sys import stdout
 
 #   ====================    FUNCTIONS    ====================    #
-#   deal with newly received message from server
-def dealWithNewMessageFromServer( messageFromServer, socketToServer ):
-    #   this is where we would see what the message type is or something
-    print( messageFromServer, end = '' )
-
 #   check for a message from the server
 def checkForNewMessageFromServer( socketToServer ):
     bytesFromServer = None
     try:
         bytesFromServer = socketToServer.recv( 1024 )
-        if bytesFromServer is not None:
+        while bytesFromServer:
             messageFromServer = bytesFromServer.decode()
-            dealWithNewMessageFromServer( messageFromServer, socketToServer )
+            stdout.buffer.write( bytesFromServer )
+            stdout.flush()
+            bytesFromServer = socketToServer.recv( 1024 )
     except socket.timeout:
         pass
     except BrokenPipeError:
@@ -39,7 +36,9 @@ clientType = "LSTN"
 socketToServer.send( clientType.encode() )
 bytesFromServer = socketToServer.recv( 1024 )
 serverGreeting = bytesFromServer.decode()
-print( serverGreeting )
+stdout.write( serverGreeting )
+stdout.flush()
+
 
 #   -----   be a client -----   #
 userMessage = None

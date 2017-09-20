@@ -11,7 +11,8 @@ def sendMessageToAllListeners( message, listeners ):
         except socket.timeout:
             pass
         except socket.error:
-            print( "\n!!! LISTENER DISCONNECTED !!!" )
+            #print( "\n!!! LISTENER DISCONNECTED !!!" )
+            pass
 
 #   check for new messages from clients
 def checkForNewMessages( speakers, listeners ):
@@ -34,8 +35,6 @@ def checkForNewMessages( speakers, listeners ):
 
 #   deal with new client connection
 def dealWithNewClientConnection( newClientConnection, newClientIPAddress, speakers, listeners ):
-    print( "New Traveler: ", newClientIPAddress )
-
     #   get client type
     newClientConnection.settimeout( 1.0 )
     bytesFromClient = newClientConnection.recv( 4 )
@@ -44,14 +43,17 @@ def dealWithNewClientConnection( newClientConnection, newClientIPAddress, speake
         newClientConnection.settimeout( 0.001 )
         speakers.append( newClientConnection )
         newClientConnection.send( speakerGreeting.encode() )
+        print( clientType, " joined. ", newClientIPAddress );
     if clientType == "LSTN":
         newClientConnection.settimeout( 0.001 )
         listeners.append( newClientConnection )
         newClientConnection.send( listenerGreeting.encode() )
+        print( clientType, " joined. ", newClientIPAddress );
+
 
 #   check for new client connection
 def checkForNewClientConnection( speakers, listeners ):
-    print( "checking for new travelers..." )
+    #print( "checking for new travelers..." )
     newClientConnection = None
     newClientIPAddress = None
     try:
@@ -73,9 +75,8 @@ port = 1337
 serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 serverSocket.bind( (hostLocalIP, port) )
 
-speakerGreeting = "Welcome, traveler. Flap your braggart gums."
-listenerGreeting = "Welcome, traveler. Rest your weary tongue."
-goodbye = "We dont take well to your kind here."
+speakerGreeting = "Welcome. We hear you."
+listenerGreeting = "Welcome to Cyberia.\n present day\n present time              \n"
 
 #   -----   setup state    -----   #
 #   list of all connected clients
