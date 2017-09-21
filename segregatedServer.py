@@ -1,5 +1,6 @@
 import socket
 import collections
+import time
 
 #   ====================    FUNCTIONS    ====================    #
 #   send a message to every connected client
@@ -31,7 +32,9 @@ def checkForNewMessages( speakers, listeners ):
             print( "\n!!! SPEAKER DISCONNECTED !!!" )
             bytesFromSpeaker = None
 
-
+#   log new client joining to server terminal
+def logNewClientJoining( clientType, newClientIPAddress ):
+    print( time.strftime("%Y-%m-%d %H:%M"), " ", clientType, " joined. ", newClientIPAddress )
 
 #   deal with new client connection
 def dealWithNewClientConnection( newClientConnection, newClientIPAddress, speakers, listeners ):
@@ -43,13 +46,12 @@ def dealWithNewClientConnection( newClientConnection, newClientIPAddress, speake
         newClientConnection.settimeout( 0.001 )
         speakers.append( newClientConnection )
         newClientConnection.send( speakerGreeting.encode() )
-        print( clientType, " joined. ", newClientIPAddress );
+        logNewClientJoining( clientType, newClientIPAddress )
     if clientType == "LSTN":
         newClientConnection.settimeout( 0.001 )
         listeners.append( newClientConnection )
         newClientConnection.send( listenerGreeting.encode() )
-        print( clientType, " joined. ", newClientIPAddress );
-
+        logNewClientJoining( clientType, newClientIPAddress )
 
 #   check for new client connection
 def checkForNewClientConnection( speakers, listeners ):
