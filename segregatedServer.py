@@ -123,7 +123,7 @@ port = 1337
 serverSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 serverSocket.bind( (hostLocalIP, port) )
 
-speakerGreeting = "Welcome. We hear you."
+speakerGreeting = "Welcome to Cyberia. begin transmission"
 listenerGreeting = "Welcome to Cyberia.\n present day\n present time              \n"
 
 #   -----   setup state    -----   #
