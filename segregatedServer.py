@@ -6,18 +6,27 @@ import time
 #   send a message to every connected client
 def sendMessageToAllListeners( message, listeners ):
     #print( "the listeners listen..." )
+    brokenListeners = []
     for listener in listeners:
         try:
             listener.send( message )
         except socket.timeout:
             pass
         except socket.error:
-            #print( "\n!!! LISTENER DISCONNECTED !!!" )
+            brokenListeners.append( listener )
+            brokenListener.close()
             pass
+
+    #   remove any broken connections
+    for brokenListener in brokenListeners:
+        listeners.remove( brokenListener )
+        brokenListener.close()
+        print( "LSTN left." )
 
 #   check for new messages from clients
 def checkForNewMessages( speakers, listeners ):
     #print( "checking for new messages..." )
+    brokenSpeakers = []
     for speaker in speakers:
         bytesFromSpeaker = None
         try:
@@ -29,8 +38,33 @@ def checkForNewMessages( speakers, listeners ):
         except socket.timeout:
             pass
         except socket.error:
-            print( "\n!!! SPEAKER DISCONNECTED !!!" )
-            bytesFromSpeaker = None
+            brokenSpeakers.append( speaker )
+            pass
+
+    #   remove any broken connections
+    for brokenSpeaker in brokenSpeakers:
+        speakers.remove( brokenSpeaker )
+        brokenSpeaker.close()
+        print( "SPKR left." )
+
+#   send a message to every connected client
+def pingAllSpeakers( speakers ):
+    #print( " pinging speakers " )
+    brokenSpeakers = []
+    for speaker in speakers:
+        try:
+            speaker.send( "PING".encode() )
+        except socket.timeout:
+            pass
+        except socket.error:
+            brokenSpeakers.append( speaker )
+            brokenSpeaker.close()
+            pass
+
+    #   remove any broken connections
+    for brokenSpeaker in brokenSpeakers:
+        speakers.remove( brokenSpeaker )
+        print( "SPKR failed PING." )
 
 #   log new client joining to server terminal
 def logNewClientJoining( clientType, newClientIPAddress ):
@@ -65,6 +99,18 @@ def checkForNewClientConnection( speakers, listeners ):
     if newClientConnection is not None:
         dealWithNewClientConnection( newClientConnection, newClientIPAddress, speakers, listeners )
 
+#   keep track of time
+def tic( lastTime, oneSecondTracker, speakers ):
+    deltaTime = time.time() - lastTime
+    oneSecondTracker += deltaTime
+
+    if oneSecondTracker > 1:
+        oneSecondTracker = 0
+        pingAllSpeakers( speakers )
+
+    lastTime = time.time()
+
+    return lastTime, oneSecondTracker
 
 #   ====================    MAIN    ====================    #
 #   -----   setup   -----   #
@@ -85,6 +131,10 @@ listenerGreeting = "Welcome to Cyberia.\n present day\n present time            
 speakers = []
 listeners = []
 
+#   time keepers
+lastTime = time.time()
+oneSecondTracker = 0
+
 #   list of clients to be removed
 disconnectedSpeakers = []
 disconnectedListeners = []
@@ -100,3 +150,4 @@ serverSocket.settimeout( 0.001 )
 while True:
     checkForNewClientConnection( speakers, listeners )
     checkForNewMessages( speakers, listeners )
+    lastTime, oneSecondTracker = tic( lastTime, oneSecondTracker, speakers )

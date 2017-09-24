@@ -1,7 +1,9 @@
 import socket
 import collections
+import sys
 import os
 from sys import stdout
+import time
 
 #   ====================    FUNCTIONS    ====================    #
 #   check for a message from the server
@@ -18,8 +20,36 @@ def checkForNewMessageFromServer( socketToServer ):
     except BrokenPipeError:
         global serverOpen
         serverOpen = False
-        print( "\n!!!!! SERVER DISCONNECTED !!!!!" )
+        print( "Alert:\tBrokenPipeError" )
+        sys.exit()
+    except socket.error:
+        print( "Alert:\t Disconnected from server." )
+        sys.exit()
 
+#   see if the server is still connected
+def pingServer( socketToServer ):
+    #print( " pinging speakers " )
+    try:
+        socketToServer.send( "PING".encode() )
+    except socket.timeout:
+        pass
+    except socket.error:
+        print( "Server failed PING." )
+        sys.exit()
+        pass
+
+#   keep track of time
+def tic( lastTime, oneSecondTracker, socketToServer ):
+    deltaTime = time.time() - lastTime
+    oneSecondTracker += deltaTime
+
+    if oneSecondTracker > 1:
+        oneSecondTracker = 0
+        pingServer( socketToServer )
+
+    lastTime = time.time()
+
+    return lastTime, oneSecondTracker
 
 #   ====================    MAIN    ====================    #
 #   -----   setup   -----   #
@@ -27,6 +57,10 @@ socketToServer = socket.socket( )
 #socketToServer.setblocking(0)
 host = "76.30.234.227"
 port = 1337
+
+#   time keepers
+lastTime = time.time()
+oneSecondTracker = 0
 
 #   -----   connect to server   -----   #
 socketToServer.settimeout(5)
@@ -46,3 +80,4 @@ socketToServer.settimeout( 0.001 )
 serverOpen = True
 while serverOpen:
     checkForNewMessageFromServer( socketToServer )
+    lastTime, oneSecondTracker = tic( lastTime, oneSecondTracker, socketToServer )
