@@ -11,9 +11,13 @@ from select import select
 #   check for a new message from the user
 def checkForMessageFromUser( socketToServer ):
     userMessage = None
-    containsStdinIfHasData, _, _ = select( [stdin], [], [], 0.01 )
-    if containsStdinIfHasData:
+    #containsStdinIfHasData, _, _ = select( [stdin], [], [], 0.01 )
+    #if containsStdinIfHasData:
+    try:
         userMessage = stdin.readline()
+    except Exception as e:
+        print( e )
+        pass
     if userMessage is not None:
         try:
             socketToServer.send( userMessage.encode() )

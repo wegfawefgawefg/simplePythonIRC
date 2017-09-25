@@ -11,10 +11,10 @@ def sendMessageToAllListeners( message, listeners ):
         try:
             listener.send( message )
         except socket.timeout:
-            pass
+            passe
         except socket.error:
             brokenListeners.append( listener )
-            brokenListener.close()
+            listener.close()
             pass
 
     #   remove any broken connections
@@ -58,7 +58,7 @@ def pingAllSpeakers( speakers ):
             pass
         except socket.error:
             brokenSpeakers.append( speaker )
-            brokenSpeaker.close()
+            speaker.close()
             pass
 
     #   remove any broken connections

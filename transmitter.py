@@ -18,7 +18,7 @@ def checkForMessageFromUser( socketToServer ):
         except BrokenPipeError:
             global serverOpen
             serverOpen = False
-            print( "Alert:\t Disconnected from server )
+            print( "Alert:\t Disconnected from server" )
 
 
 #   ====================    MAIN    ====================    #
