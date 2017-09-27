@@ -11,7 +11,7 @@ def sendMessageToAllListeners( message, listeners ):
         try:
             listener.send( message )
         except socket.timeout:
-            passe
+            pass
         except socket.error:
             brokenListeners.append( listener )
             listener.close()
